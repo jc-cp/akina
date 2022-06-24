@@ -1,4 +1,4 @@
-#### Main script of the recommendation engine ####
+# Main script of the recommendation engine. #
 
 import numpy
 import matplotlib as plt
