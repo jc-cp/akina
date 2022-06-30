@@ -1,1 +1,1 @@
-# This is a dummy file for a python scraper for information gathering. #
+# This file is a python scraper for web-information gathering.
