@@ -5,11 +5,12 @@ import numpy
 import matplotlib as plt
 
 # Files
-import helper_functions
+from preprocessing import Preprocessing
 
 
 def main():
 
+    Preprocessing.read_data()
     pass
 
 
