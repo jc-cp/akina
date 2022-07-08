@@ -2,7 +2,7 @@
 
 class Preprocessing:
 
-    def read_data(self):
+    def get_data(self):
         pass
 
     def filter_vehicles(self):
