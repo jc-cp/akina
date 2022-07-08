@@ -6,4 +6,3 @@ def convert_int(x):
         return int(x)
     except:
         return 0
-
