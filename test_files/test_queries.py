@@ -2,7 +2,7 @@ import pymongo
 from pymongo import MongoClient
 
 cluster = MongoClient("mongodb+srv://jayqwalin:sBizum7HyN2Isvmi@cluster0.hvkyyid.mongodb.net/?retryWrites=true&w=majority")
-db = cluster["AkinaDB"]
+db = cluster["akina"]
 collection = db["listings_AutoScout"]
 
 print(collection.find({"MAKENAME":"BMW"}))
