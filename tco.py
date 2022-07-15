@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import numpy as np
 import random
 import pandas as pd
-import datetime
+from data_handler import DataHandler
 
 # These are the variables that the user can define which will affect the calculation, defaults are below, periods are in years
 userInput = {"KM_PER_MONTH": 1000, "HOLDING_TIME": 5, "Birthday": "15.10.1990", "PREVIOUS_EXPERIENCE": 3, "NUMBER_OF_DRIVERS": 1,
@@ -34,6 +34,9 @@ listings_csv.set_index("GUID", inplace=True)
 
 
 class TCO:
+    def __init__(self):
+        pass
+
     def insurance_buying(self, age, experience, location, body_type, offer_type, car_brand, km_per_month):
         # This is going to be painful af, need tons of user data to scrape web calculators
         return
@@ -43,11 +46,11 @@ class TCO:
         return
 
     @staticmethod
-    def registration(self, location):
+    def registration(location):
         return random.randint(100, 140)
 
     @staticmethod
-    def repairs(self, km_per_month, car_age):
+    def repairs(km_per_month, car_age):
         inspection_yearly = 100
         oil_change_yearly = 100
         tires_yearly = None
@@ -55,11 +58,11 @@ class TCO:
         return
 
     @staticmethod
-    def inspection(self):
+    def inspection():
         return random.randint(57, 134)
 
     @staticmethod
-    def taxes(self, emission, displacement, fuel_type):
+    def taxes(emission, displacement, fuel_type):
         # SOURCE: https://www.leasingmarkt.de/magazin/recht/auto-unterhaltskosten
         # TODO: Check for exceptions such as "Sonstige" or "Erdgas"
         # TODO: Potentially scrape, check differences due to registry year
@@ -79,7 +82,7 @@ class TCO:
         return taxes
 
     @staticmethod
-    def subsidies_buying_new(self, fuel_type, registry_date, list_price, consumption):
+    def subsidies_buying_new(fuel_type, registry_date, list_price, consumption):
         # SOURCE: https://www.adac.de/rund-ums-fahrzeug/elektromobilitaet/kaufen/foerderung-elektroautos/
         if registry_date < 2020 or list_price > 65000:
             return 0
@@ -96,7 +99,7 @@ class TCO:
                 return 5625
 
     @staticmethod
-    def subsidies_buying_used(self, fuel_type, registry_date, list_price_new, used_price, mileage, consumption):
+    def subsidies_buying_used(fuel_type, registry_date, list_price_new, used_price, mileage, consumption):
         # SOURCE: https://www.adac.de/rund-ums-fahrzeug/elektromobilitaet/kaufen/foerderung-elektroautos/
         # TODO: Parse registry date string input
         # TODO: Get new list price function
@@ -118,7 +121,7 @@ class TCO:
             return 0
 
     @staticmethod
-    def subsidies_leasing(self, fuel_type, registry_date, list_price_new, consumption, duration):
+    def subsidies_leasing(fuel_type, registry_date, list_price_new, consumption, duration):
         # SOURCE: https://www.adac.de/rund-ums-fahrzeug/elektromobilitaet/kaufen/foerderung-elektroautos/
         if registry_date < 2019 or list_price_new > 65000:
             return 0
@@ -156,14 +159,13 @@ class TCO:
         else:
             return 0
 
-    @staticmethod
     def avg_depreciation(self, original_price, car_age, holding_time):  # Holding time in years
         resell_value = self.resell_value(original_price, car_age, holding_time)
         depreciation = original_price - resell_value
         return depreciation/(holding_time*12)
 
     @staticmethod
-    def fuel_costs(self, km_per_month, consumption, fuel_type):
+    def fuel_costs(km_per_month, consumption, fuel_type):
         diesel = 1.3
         benzin = 1.3
         kWh = 1.3
@@ -179,17 +181,17 @@ class TCO:
             return None
 
     @staticmethod
-    def leasing_rate(self, holding_time, original_price, residual_value):
+    def leasing_rate(holding_time, original_price, residual_value):
         # TODO: Define residual value function
         interest_rate = 0.03
         return (original_price - residual_value)/holding_time + (original_price + residual_value)/2 * interest_rate/12
 
     @staticmethod
-    def subscription_rate(self, km_per_month):
+    def subscription_rate(km_per_month):
         return
 
     @staticmethod
-    def resell_value(self, original_price, car_age, holding_time, mileage=None, previous_owners=None):
+    def resell_value(original_price, car_age, holding_time, mileage=None, previous_owners=None):
         current_value = original_price*pow(0.85, car_age)
         return current_value*pow(0.85, holding_time)
 
