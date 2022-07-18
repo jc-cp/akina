@@ -29,4 +29,8 @@ class DataHandler:
     def get_mileage(self, id):
         return self.dataframe.loc[id, "MILEAGE"]
 
+    def get_consumption(self, id):
+        return self.dataframe.loc[id, "CONSUMPTION_MIXED"]
 
+    def get_e_consumption(self, id):
+        return self.dataframe.loc[id, "ELECTRIC_CONSUMPTION_MIXED"]
