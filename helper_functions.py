@@ -75,8 +75,27 @@ class HelperFunctions:
         return np.mean((y_true - y_pred) ** 2)
 
     def user_input(self):
+        print("Hi, and welcome to AKINA v0.1! \n")
+        print("Let's find your dream car in under 5 minutes! \n")
+        print("First, we want to know what you are actually looking for in a car. \n")
+        print("Therefore, a list containing 10 needs will be shown in the next step and we want you to select the five "
+              "most relevant ones. \n")
+
+        print("Please press [ENTER].")
+
+        # TODO: add waitforkeyresponse()
+        # TODO: check for how to put tabs in print comments
+        print("1: " + self.needs[0] + "\t" + "2: " + self.needs[1] + "\n" +
+              "3: " + self.needs[2] + "\t" + "4: " + self.needs[3] + "\n" +
+              "5: " + self.needs[4] + "\t" + "6: " + self.needs[5] + "\n" +
+              "7: " + self.needs[6] + "\t" + "8: " + self.needs[7] + "\n" +
+              "9: " + self.needs[2] + "\t" + "10: " + self.needs[9] + "\n")
+
         # TODO: ask for the needs and return the five selected ones
+
+        # return list_user_needs
         pass
 
     def run(self):
+        self.user_input()
         pass
