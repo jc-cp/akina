@@ -57,3 +57,6 @@ class kNN:
         # plt.xlabel('K Value')
         # plt.ylabel('Mean Error')
         pass
+
+    def run(self):
+        pass

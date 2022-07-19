@@ -7,14 +7,25 @@ import seaborn as sns
 
 # Files
 from preprocessing import Preprocessing
-from helper_functions import Helper
+from helper_functions import HelperFunctions
+# from tco import TCO
+from kNN import kNN
 
 
 def main():
+    # Initialize classes
+    pp = Preprocessing()
+    hf = HelperFunctions()
+    # TODO: add NN
+    # TODO: add kNN
+    # TODO: add TCO
 
-    # Preprocessing.read_data()
-    #
-    pass
+    # Run the main class functions
+    pp.run()
+    hf.run()
+    # TODO: add NN
+    # TODO: add kNN
+    # TODO: add TCO
 
 
 if __name__ == '__main__':

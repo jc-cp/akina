@@ -4,15 +4,19 @@
 import numpy as np
 
 
-class Helper:
+class HelperFunctions:
 
-    def convert_int(x):
+    def __init__(self):
+        self.needs = ['SUSTAINABILTY', 'STORAGE', 'SPACE', 'TRAVEL_FRIENDLY', 'DRIVING_EXPERIENCE', 'CITY_FRIENDLY',
+                      'FAMILY_FRIENDLY', 'STATUS', 'FUEL_EFFICIENCY']
+
+    def convert_int(self, x):
         try:
             return int(x)
         except:
             return 0
 
-    def fit_least_squares(X, y):
+    def fit_least_squares(self, X, y):
         """Fit ordinary least squares model to the data.
 
         Parameters
@@ -30,7 +34,7 @@ class Helper:
         """
         return np.linalg.pinv(X) @ y
 
-    def fit_ridge(X, y, reg_strength):
+    def fit_ridge(self, X, y, reg_strength):
         """Fit ridge regression model to the data.
 
         Parameters
@@ -50,7 +54,7 @@ class Helper:
         """
         return np.linalg.inv(X.T @ X + reg_strength * np.eye(X.shape[1])) @ X.T @ y
 
-    def mean_squared_error(y_true, y_pred):
+    def mean_squared_error(self, y_true, y_pred):
         """Compute mean squared error between true and predicted regression targets.
 
         Reference: `https://en.wikipedia.org/wiki/Mean_squared_error`
@@ -70,14 +74,9 @@ class Helper:
         """
         return np.mean((y_true - y_pred) ** 2)
 
-    def PolyCoefficients(x, coeffs):
-        """ Returns a polynomial for ``x`` values for the ``coeffs`` provided.
+    def user_input(self):
+        # TODO: ask for the needs and return the five selected ones
+        pass
 
-        The coefficients must be in ascending order (``x**0`` to ``x**o``).
-        """
-        o = len(coeffs)
-        print(f'# This is a polynomial of order {o}.')
-        y = 0
-        for i in range(o):
-            y += coeffs[i] * x ** i
-        return y
+    def run(self):
+        pass
