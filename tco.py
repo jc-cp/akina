@@ -6,15 +6,13 @@ import pandas as pd
 from data_handler import DataHandler
 from user import User
 
-# These are the variables that the user can define which will affect the calculation, defaults are below, periods are in years
-userInput = {"KM_PER_MONTH": 1000, "HOLDING_TIME": 5, "Birthday": "15.10.1990", "PREVIOUS_EXPERIENCE": 3, "NUMBER_OF_DRIVERS": 1,
-             "LOCATION": None, "INSURANCE_TYPE": None, "OWNS_CAR_ATM": None}
+writer = pd.ExcelWriter("test_data/output.xlsx")
 
 # These are all the cost variables across all ownership models that we will use to evaluate the total cost of ownership
-tcoVars = ["INSURANCE_BUYING", "INSURANCE_LEASING", "REGISTRATION", "REPAIRS", "MAINTENANCE", "TAXES", "SUBSIDIES_BUYING", "SUBSIDIES_LEASING",
+tco_vars = ["INSURANCE_BUYING", "INSURANCE_LEASING", "REGISTRATION", "REPAIRS", "MAINTENANCE", "TAXES", "SUBSIDIES_BUYING", "SUBSIDIES_LEASING",
            "DEPRECIATION", "FUEL_MONTHLY", "LEASING_RATE", "SUBSCRIPTION_RATE", "RESALE_VALUE"]
 
-outputVars = {"BUYING": None, "LEASING": None, "SUBSCRIPTION": None}
+calc_vars = ["ARTICLE_OFFER_TYPE", "CO2_EMISSION", "DISPLACEMENT", "REGISTRATION_YEAR", "PRICE_PUBLIC", "FUEL_TYPE", "MILEAGE", "CONSUMPTION_MIXED", "ELECTRIC_CONSUMPTION_MIXED"]
 
 # MongoDB Handling
 # cluster = MongoClient("mongodb+srv://jayqwalin:sBizum7HyN2Isvmi@cluster0.hvkyyid.mongodb.net/?retryWrites=true&w=majority")
@@ -28,7 +26,8 @@ outputVars = {"BUYING": None, "LEASING": None, "SUBSCRIPTION": None}
 
 # Local Test Data CSV Handling
 listings_csv = pd.read_csv("test_data/Test Data.csv", sep=";")
-for var in tcoVars:
+
+for var in tco_vars:
     listings_csv.insert(loc=len(listings_csv.columns), column=var, value=None)
 
 listings_csv.set_index("GUID", inplace=True)
@@ -104,7 +103,6 @@ class TCO:
         # SOURCE: https://www.adac.de/rund-ums-fahrzeug/elektromobilitaet/kaufen/foerderung-elektroautos/
         # TODO: Parse registry date string input
         # TODO: Get new list price function
-
         if registry_date < 2019 or list_price_new > 65000:
             return 0
 
@@ -113,7 +111,7 @@ class TCO:
                 return 5000
             else:
                 return 0
-        elif (fuel_type == "Elektro/Benzin" or fuel_type == "Elektro/Benzin") and emission < 50:
+        elif (fuel_type == "Elektro/Benzin" or fuel_type == "Elektro/Diesel") and emission < 50:
             if mileage <= 15000 and used_price <= 0.8 * list_price_new:  # Conditions to receive government support
                 return 3750
             else:
@@ -122,7 +120,7 @@ class TCO:
             return 0
 
     @staticmethod
-    def subsidies_leasing(fuel_type, registry_date, list_price_new, Emission, duration):
+    def subsidies_leasing(fuel_type, registry_date, list_price_new, emission, duration):
         # SOURCE: https://www.adac.de/rund-ums-fahrzeug/elektromobilitaet/kaufen/foerderung-elektroautos/
         if registry_date < 2019 or list_price_new > 65000:
             return 0
@@ -163,7 +161,7 @@ class TCO:
     def avg_depreciation(self, original_price, car_age, holding_time):  # Holding time in years
         resell_value = self.resell_value(original_price, car_age, holding_time)
         depreciation = original_price - resell_value
-        return depreciation/(holding_time*12)
+        return depreciation/(holding_time)
 
     @staticmethod
     def fuel_costs(km_per_month, consumption, e_consumption, fuel_type):
@@ -176,9 +174,15 @@ class TCO:
         if fuel_type == "Elektro":
             return e_consumption*km_per_month*kWh/100
         elif fuel_type == "Benzin" or fuel_type == "Elektro/Benzin":
-            return consumption*km_per_month*benzin/100 + e_consumption*km_per_month*kWh/100
+            if not np.isnan(e_consumption):
+                return consumption*km_per_month*benzin/100 + e_consumption*km_per_month*kWh/100
+            else:
+                return consumption*km_per_month*benzin/100
         elif fuel_type == "Diesel" or fuel_type == "Elektro/Diesel":
-            return consumption*km_per_month*diesel/100 + e_consumption*km_per_month*kWh/100
+            if not np.isnan(e_consumption):
+                return consumption*km_per_month*diesel/100 + e_consumption*km_per_month*kWh/100
+            else:
+                return consumption*km_per_month*diesel/100
         else:
             return None
 
@@ -192,16 +196,17 @@ class TCO:
         return
 
     @staticmethod
-    def resell_value(original_price, car_age, holding_time, mileage=None, previous_owners=None):
-        current_value = original_price*pow(0.85, car_age)
-        return current_value*pow(0.85, holding_time)
+    def resell_value(list_price, car_age, holding_time, mileage=None, previous_owners=None):
+        holding_time = holding_time/12
+        return list_price*pow(0.85, holding_time)
 
 
 tco = TCO()
 dh = DataHandler(listings_csv)
-test_user = User("Hans Zimmer", 43, 1200, holding_time=3)
+test_user = User("Hans Zimmer", 43, 1200, holding_time=36)
 
 
+i = 0
 for listing in listings_csv.index:
     emission = dh.get_emission(listing)
     displacement = dh.get_displacement(listing)
@@ -212,22 +217,21 @@ for listing in listings_csv.index:
     consumption = dh.get_consumption(listing)
     e_consumption = dh.get_e_consumption(listing)
     car_age = dh.get_car_age(listing)
-
     resell_value = tco.resell_value(list_price, car_age, test_user.holding_time)
 
     listings_csv.loc[listing, "REGISTRATION"] = tco.registration(None)
     listings_csv.loc[listing, "INSPECTION"] = tco.inspection()
     listings_csv.loc[listing, "TAXES"] = tco.taxes(emission, displacement, fuel)
 
-    if listings_csv.loc[listing, "ARTICLE_OFFER_TYPE"] == "GEBRAUCHT" or listings_csv.loc[listing, "ARTICLE_OFFER_TYPE"] == "JAHRESWAGEN":
-        listings_csv.loc[listing, "SUBSIDIES_BUYING"] = tco.subsidies_buying_used(fuel, registration, list_price, list_price*1.5, mileage, emission)
-    elif listings_csv.loc[listing, "ARTICLE_OFFER_TYPE"] == "NEU":
+    if listings_csv.loc[listing, "ARTICLE_OFFER_TYPE"] == "Gebraucht" or listings_csv.loc[listing, "ARTICLE_OFFER_TYPE"] == "Jahreswagen":
+        listings_csv.loc[listing, "SUBSIDIES_BUYING"] = tco.subsidies_buying_used(fuel, registration, list_price*1.25, list_price, mileage, emission)
+    elif listings_csv.loc[listing, "ARTICLE_OFFER_TYPE"] == "Neu":
         listings_csv.loc[listing, "SUBSIDIES_BUYING"] = tco.subsidies_buying_new(fuel, registration, list_price, emission)
-
+    listings_csv.loc[listing, "SUBSIDIES_LEASING"] = tco.subsidies_leasing(fuel, registration, list_price, emission, test_user.holding_time)
     listings_csv.loc[listing, "DEPRECIATION"] = tco.avg_depreciation(list_price, car_age, test_user.holding_time)
     listings_csv.loc[listing, "FUEL_MONTHLY"] = tco.fuel_costs(test_user.km_per_month, consumption, e_consumption, fuel)
     listings_csv.loc[listing, "LEASING_RATE"] = tco.leasing_rate(test_user.holding_time, list_price, resell_value)
     listings_csv.loc[listing, "RESALE_VALUE"] = resell_value
 
-
-listings_csv.to_csv("output.csv")
+listings_csv[calc_vars + tco_vars].to_excel(writer)
+writer.save()
