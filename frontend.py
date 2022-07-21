@@ -7,12 +7,6 @@ root2 = tk.Tk()
 
 root.wm_attributes("-transparentcolor", "red")
 
-# User Input Canvas
-img = Image.open("images/desire2.png")
-canvas = tk.Canvas(root, bg="#00FA8E", height=896, width=414)
-img = ImageTk.PhotoImage(img)
-img_label = tk.Label(canvas, image=img)
-img_label.pack()
 
 # Recommender Output Canvas
 canvas2 = tk.Canvas(root2, height=896, width=414, bg="white")
@@ -64,6 +58,13 @@ reference = canvas2.create_polygon(ref_points, width=5, fill="white", outline="b
 match = canvas2.create_polygon(points, width=3, fill="#00FA8E")
 
 
+# User Input Canvas
+img = Image.open("images/desire2.png")
+canvas = tk.Canvas(root, bg="#00FA8E", height=896, width=414)
+img = ImageTk.PhotoImage(img)
+img_label = tk.Label(canvas, image=img)
+img_label.pack()
+
 # Button Images
 driving_img = tk.PhotoImage(file="images/driving.png")
 city_img = tk.PhotoImage(file="images/city.png")
@@ -85,7 +86,7 @@ needs = {"Driving Experience": tk.IntVar(), "City Friendly": tk.IntVar(), "Susta
          "Storage": tk.IntVar(), "Travel Friendly": tk.IntVar()}
 
 
-# Button Functions
+# User Input Button Functions
 def checkbox_clicked():
     sum = 0
     for need in needs:
@@ -94,7 +95,7 @@ def checkbox_clicked():
         print("Too many needs selected madude")
 
 
-# Buttons
+# User Input Buttons
 driving_button = tk.Checkbutton(canvas, text="Driving Experience", font="Inter", bg="white", width=18, height=2,
                                 activebackground="#00FA8E", variable=needs["Driving Experience"])
 city_button = tk.Checkbutton(canvas, text="City Friendly", font="Inter", width=18, bg="white", height=2,
@@ -123,8 +124,7 @@ travel_button = tk.Checkbutton(canvas, text="Travel Friendly", font="Inter", wid
 buttons = [driving_button, city_button, sustainable_button, fuel_button, status_button, comfort_button, safety_button,
            family_button, emob_button, reliable_button, storage_button, travel_button]
 
-
-# Button Positioning
+# User Input Button Positioning
 base_x = 12
 base_y = 380
 offset_x = 200
@@ -132,6 +132,7 @@ offset_y = 70
 
 i = 1
 for button in buttons:
+    #print(button.cget("text"), button.cget("variable").value())
     button.place(x=base_x + (i % 2)*offset_x, y=base_y + (math.ceil(i/2)-1)*offset_y)
     i += 1
 
@@ -139,6 +140,8 @@ next_button_img = tk.PhotoImage(file="images/Button.png")
 next_button = tk.Button(canvas, image=next_button_img, borderwidth=0, bg="red")
 next_button.place(x=212, y=800, anchor="n")
 
+
+# Output
 canvas.pack()
 canvas2.pack()
 root.mainloop()
