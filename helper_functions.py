@@ -3,12 +3,16 @@
 # Helper function to convert NaN to 0, if there are any, and all other years to integers.
 import numpy as np
 
+from preprocessing import Preprocessing
+
 
 class HelperFunctions:
 
     def __init__(self):
-        self.needs = ['SUSTAINABILTY', 'STORAGE', 'SPACE', 'TRAVEL_FRIENDLY', 'DRIVING_EXPERIENCE', 'CITY_FRIENDLY',
-                      'FAMILY_FRIENDLY', 'STATUS', 'FUEL_EFFICIENCY']
+        self.needs = ['SUSTAINABILTY', 'STORAGE', 'TRAVEL_FRIENDLY', 'DRIVING_EXPERIENCE', 'CITY_FRIENDLY',
+                      'FAMILY_FRIENDLY', 'STATUS', 'FUEL_EFFICIENCY', 'COMFORT', 'SAFETY', 'E-MOBILITY', 'RELIABILITY']
+
+        self.list_user_needs = []
 
     def convert_int(self, x):
         try:
@@ -93,8 +97,15 @@ class HelperFunctions:
 
         # TODO: ask for the needs and return the five selected ones
 
-        # return list_user_needs
-        pass
+        list_user_needs = self.list_user_needs
+        return list_user_needs
+
+    def match_needs_to_scores(self):
+        user_input = self.list_user_needs
+
+        if user_input == 'SUSTAINABILITY':
+
+
 
     def run(self):
         self.user_input()
