@@ -21,7 +21,7 @@ class Preprocessing:
                                  'EQUIPMENTS', 'EMISSION_CLASS', 'CONSUMPTION_MIXED', 'ELECTRIC_CONSUMPTION_MIXED',
                                  'EFFICIENCY_CLASS', 'CO2_EMISSION', 'SEATS', 'DOORS', 'EMISSION_STICKER']
 
-        self.sigVars_listings_num = ['REGISTRATION_YEAR', 'MILEAGE', 'HORSEPOWER', 'PREV_OWNERS', 'CONSUMPTION_MIXED',
+        self.sigVars_listings_num = ['GUID', 'PRICE_PUBLIC', 'REGISTRATION_YEAR', 'MILEAGE', 'HORSEPOWER', 'PREV_OWNERS', 'CONSUMPTION_MIXED',
                                      'ELECTRIC_CONSUMPTION_MIXED', 'CO2_EMISSION', 'SEATS']
 
         self.sigVars_listings_cat = ['GUID', 'MAKENAME', 'MODELNAME', 'FUEL_TYPE', 'GEARING_TYPE', 'BODY_TYPE',
@@ -72,6 +72,7 @@ class Preprocessing:
         """ Filters outliers according to mean and standard deviation of the infividual categories
         """
 
+
         listings_numerical = listings[self.sigVars_listings_num]
 
         second_dataframe = listings.dropna(subset='ELECTRIC_CONSUMPTION_MIXED')
@@ -80,7 +81,7 @@ class Preprocessing:
         n_std = 2
 
         for col in listings_numerical.columns:
-            if col != 'ELECTRIC_CONSUMPTION_MIXED':
+            if col != 'ELECTRIC_CONSUMPTION_MIXED' and col != "PRICE_PUBLIC" and col != "GUID":
                 mean = listings_numerical[col].mean()
                 sd = listings_numerical[col].std()
                 listings_numerical = listings_numerical[listings_numerical[col] <= mean + (n_std * sd)]
@@ -229,6 +230,8 @@ class Preprocessing:
             score_map = self.scoring_co2_emission(x)
         elif feature_name == 'PREV_OWNERS':
             score_map = self.scoring_prev_owners(x)
+        elif feature_name == 'PRICE_PUBLIC' or feature_name == "GUID":
+            score_map = [0,0,0,0,0,0,0,0,0,0]
         else:
             print('Score couldnt be found.')
             pass
@@ -236,12 +239,8 @@ class Preprocessing:
         return score_map
 
     def save_scores(self):
-
-
-
         df_out = pd.DataFrame(self.dict_scores)
         df_out.to_csv('test_data/listings_shorted.csv', encoding = 'utf-8')
-
 
     def run(self):
         # FOR MONGO DB
@@ -278,35 +277,35 @@ class Preprocessing:
 
         for feature in listings_num_filtered.columns:
             # self.x_temp, _ = sns.kdeplot(listings_num_filtered[feature], cut=0).get_lines()[0].get_data()
-            #x, _ = sns.distplot(listings_num_filtered[feature]).get_lines()[0].get_data()
+            # x, _ = sns.distplot(listings_num_filtered[feature]).get_lines()[0].get_data()
+            if feature != 'GUID' and feature != 'PRICE_PUBLIC':
+                max_val = np.max(listings_num_filtered[feature])
+                min_val = np.min(listings_num_filtered[feature])
+                #fx = np.linspace(min_val, max_val, len(listings_num_filtered[feature]))
 
-            max_val = np.max(listings_num_filtered[feature])
-            min_val = np.min(listings_num_filtered[feature])
-            fx = np.linspace(min_val, max_val, len(listings_num_filtered[feature]))
+                # print(self.x_temp)
+                # print(listings_num_filtered[feature])
+                score_map = self.run_scoring(feature, listings_num_filtered[feature])
+                print("Feature: " + feature + "\t" + "Scoring: ", score_map)
+                # print(feature)
+                listings_num_filtered[feature + "_SCORE"] = 0
 
-            # print(self.x_temp)
-            # print(listings_num_filtered[feature])
-            score_map = self.run_scoring(feature, listings_num_filtered[feature])
-            print("Feature: " + feature + "\t" + "Scoring: ", score_map)
-            # print(feature)
-            listings_num_filtered[feature + "_SCORE"] = 0
+                for i in range(0, len(listings_num_filtered[feature])):
+                    j = 0
+                    for score in score_map:
 
-            for i in range(0, len(listings_num_filtered[feature])):
-                j = 0
-                for score in score_map:
+                        if feature in ["MILEAGE", "PREV_OWNERS", "CO2_EMISSION", "CONSUMPTION_MIXED"]:
+                            if listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature)] >= score:
+                                listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature + "_SCORE")] = j
+                                break
 
-                    if feature in ["MILEAGE", "PREV_OWNERS", "CO2_EMISSION", "CONSUMPTION_MIXED"]:
-                        if listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature)] >= score:
-                            listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature + "_SCORE")] = j
-                            break
+                        else:
+                            if listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature)] <= score:
+                                listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature + "_SCORE")] = j
+                                break
+                        j += 1
 
-                    else:
-                        if listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature)] <= score:
-                            listings_num_filtered.iloc[i, listings_num_filtered.columns.get_loc(feature + "_SCORE")] = j
-                            break
-                    j += 1
-
-        listings_num_filtered.to_csv('test_data/listings_shorted_scores.csv', encoding = 'utf-8')
+            listings_num_filtered.to_csv('test_data/listings_shorted_scores.csv', encoding='utf-8')
 
     # TODO: Think about returning all scores as end-result of this class, can be fed into NN ?
     # return scores
