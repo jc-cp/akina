@@ -4,24 +4,24 @@
 import numpy as np
 import pandas as pd
 
-from preprocessing import Preprocessing
-
 
 class HelperFunctions:
 
     def __init__(self):
-        self.needs = ['SUSTAINABILTY', 'STORAGE', 'TRAVEL_FRIENDLY', 'DRIVING_EXPERIENCE', 'CITY_FRIENDLY',
+        self.needs = ['SUSTAINABILITY', 'STORAGE', 'TRAVEL_FRIENDLY', 'DRIVING_EXPERIENCE', 'CITY_FRIENDLY',
                       'FAMILY_FRIENDLY', 'STATUS', 'FUEL_EFFICIENCY', 'COMFORT', 'SAFETY', 'E-MOBILITY', 'RELIABILITY']
 
         self.list_user_needs = []
 
-    def convert_int(self, x):
+    @staticmethod
+    def convert_int(x):
         try:
             return int(x)
         except:
             return 0
 
-    def fit_least_squares(self, X, y):
+    @staticmethod
+    def fit_least_squares(X, y):
         """Fit ordinary least squares model to the data.
 
         Parameters
@@ -39,6 +39,7 @@ class HelperFunctions:
         """
         return np.linalg.pinv(X) @ y
 
+    @staticmethod
     def fit_ridge(self, X, y, reg_strength):
         """Fit ridge regression model to the data.
 
@@ -59,6 +60,7 @@ class HelperFunctions:
         """
         return np.linalg.inv(X.T @ X + reg_strength * np.eye(X.shape[1])) @ X.T @ y
 
+    @staticmethod
     def mean_squared_error(self, y_true, y_pred):
         """Compute mean squared error between true and predicted regression targets.
 
@@ -156,19 +158,13 @@ class HelperFunctions:
                 user_input_scores.append(average_list)
 
             else:
-                print("Couldnt find need.")
-
-        # print('USER input score:', user_input_scores)
-
-
+                print("Couldn't find need.")
 
         for j in range(0, len(user_input_scores[0])):
             avg_scores_user = 0
             for i in range(0, len(user_input_scores)):
                 avg_scores_user += user_input_scores[i][j]
             avg_final_score.append(avg_scores_user/5)
-
-        #print("avg_scores_user: ", avg_scores_user)
 
         listings_scores["SUM_USER"] = 0
 
@@ -180,8 +176,6 @@ class HelperFunctions:
         return listings_scores
 
     def filter_budget(self, listings_df, budget):
-        list_ind_scores = []
-
         listings = listings_df
         listings = listings[listings["PRICE_PUBLIC"] <= budget]
         listings.reset_index()
@@ -191,26 +185,37 @@ class HelperFunctions:
         print(max_val, index, listings.iloc[index, listings.columns.get_loc("GUID")])
         listings.to_csv('test_data/output.csv')
 
-
         return max_val, index, listings.iloc[index, listings.columns.get_loc("GUID")]
+
+    def find_car(self, big_listings, id):
+
+        makename = big_listings.loc[big_listings["GUID"] == id]["MAKENAME"].item()
+        modelname = big_listings.loc[big_listings["GUID"] == id]["MODELNAME"].item()
+        image_link = big_listings.loc[big_listings["GUID"] == id]["IMAGE_URL"].item()
+
+        print(makename)
+        print(modelname)
+        print(image_link)
+
+        return makename, modelname, image_link
 
     def run(self):
         list_user_needs = ['COMFORT', 'RELIABILITY', 'FUEL_EFFICIENCY', 'DRIVING_EXPERIENCE', 'SUSTAINABILITY']
         listings_df = self.match_needs_to_scores(list_user_needs)
         max_val, index, id = self.filter_budget(listings_df, 15000)
 
-        out_dict = {}
-        out_dict = dict.fromkeys(list_user_needs, 0)
+        big_listings = pd.read_csv('test_data/listings.de_de.csv')
+        makename, modelname, image_link = self.find_car(big_listings, id)
 
+        out_dict = dict.fromkeys(list_user_needs, 0)
         for need in list_user_needs:
             out_dict[need] = listings_df.loc[listings_df["GUID"] == id][need + "_SCORE"].item()
+        # print(out_dict)
 
-            #print(out_dict[need])
-        print(out_dict)
-        return max_val, index, id, out_dict
+        return max_val, index, id, out_dict, makename, modelname, image_link
+
 
 if __name__ == "__main__":
     # Generate an instance of the class
     hf = HelperFunctions()
     hf.run()
-    # pp.run()

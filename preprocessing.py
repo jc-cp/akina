@@ -249,8 +249,7 @@ class Preprocessing:
         # listings_num_filtered, second_dataframe = self.filter_numerical(self, listings)
 
         # FOR DESIGN FAIR
-        listings = pd.read_csv("test_data/Test_data.csv", sep=";")
-        listings_header = self.sigVars_listings_num + self.header_sccores
+        listings = pd.read_csv("test_data/listings.de_de.csv", sep=",")
         listings_num_filtered, second_dataframe = self.filter_numerical(listings)
 
         """"
@@ -281,7 +280,7 @@ class Preprocessing:
             if feature != 'GUID' and feature != 'PRICE_PUBLIC':
                 max_val = np.max(listings_num_filtered[feature])
                 min_val = np.min(listings_num_filtered[feature])
-                #fx = np.linspace(min_val, max_val, len(listings_num_filtered[feature]))
+                # fx = np.linspace(min_val, max_val, len(listings_num_filtered[feature]))
 
                 # print(self.x_temp)
                 # print(listings_num_filtered[feature])

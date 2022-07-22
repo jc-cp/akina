@@ -16,17 +16,10 @@ def main():
     # Initialize classes
     pp = Preprocessing()
     hf = HelperFunctions()
-    # TODO: add NN
-    # TODO: add kNN
-    # TODO: add TCO
 
-    # Run the main class functions
+    # Run the main class f
     pp.run()
     hf.run()
-    # TODO: add NN
-    # TODO: add kNN
-    # TODO: add TCO
-
 
 if __name__ == '__main__':
     main()
