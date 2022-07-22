@@ -191,13 +191,15 @@ class HelperFunctions:
 
         makename = big_listings.loc[big_listings["GUID"] == id]["MAKENAME"].item()
         modelname = big_listings.loc[big_listings["GUID"] == id]["MODELNAME"].item()
+        offer_link = big_listings.loc[big_listings["GUID"] == id]["DETAIL_LINK"].item()
         image_link = big_listings.loc[big_listings["GUID"] == id]["IMAGE_URL"].item()
 
         print(makename)
         print(modelname)
         print(image_link)
+        print(offer_link)
 
-        return makename, modelname, image_link
+        return makename, modelname, image_link, offer_link
 
     def run(self):
         list_user_needs = ['COMFORT', 'RELIABILITY', 'FUEL_EFFICIENCY', 'DRIVING_EXPERIENCE', 'SUSTAINABILITY']
@@ -205,14 +207,14 @@ class HelperFunctions:
         max_val, index, id = self.filter_budget(listings_df, 15000)
 
         big_listings = pd.read_csv('test_data/listings.de_de.csv')
-        makename, modelname, image_link = self.find_car(big_listings, id)
+        makename, modelname, image_link, offer_link = self.find_car(big_listings, id)
 
         out_dict = dict.fromkeys(list_user_needs, 0)
         for need in list_user_needs:
             out_dict[need] = listings_df.loc[listings_df["GUID"] == id][need + "_SCORE"].item()
         # print(out_dict)
 
-        return max_val, index, id, out_dict, makename, modelname, image_link
+        return max_val, index, id, out_dict, makename, modelname, image_link, offer_link
 
 
 if __name__ == "__main__":
