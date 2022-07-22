@@ -2,7 +2,6 @@ import random
 import tkinter as tk
 from PIL import Image, ImageTk
 import math
-import random
 
 
 # User Input Button Functions

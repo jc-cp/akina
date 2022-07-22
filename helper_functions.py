@@ -201,10 +201,10 @@ class HelperFunctions:
 
         return makename, modelname, image_link, offer_link
 
-    def run(self):
+    def run(self, budget):
         list_user_needs = ['COMFORT', 'RELIABILITY', 'FUEL_EFFICIENCY', 'DRIVING_EXPERIENCE', 'SUSTAINABILITY']
         listings_df = self.match_needs_to_scores(list_user_needs)
-        max_val, index, id = self.filter_budget(listings_df, 15000)
+        max_val, index, id = self.filter_budget(listings_df, budget)
 
         big_listings = pd.read_csv('test_data/listings.de_de.csv')
         makename, modelname, image_link, offer_link = self.find_car(big_listings, id)
