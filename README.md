@@ -17,6 +17,6 @@ Akina is the tool that helps you find your dream car in under 5 min.
     - PIL
     - math
     - tkinter
-4. Create a folder named "$/test\_data$", add it to the ".gitignore" file and copy the listings file into the folder. It will be used to load and save all ".csv" imports and exports.
+4. Create a folder named "/test\_data", add it to the ".gitignore" file and copy the listings file into the folder. It will be used to load and save all ".csv" imports and exports.
 5. Check your Python version with "python --version".
 6. If there are no installations errors, the system is ready to go!
