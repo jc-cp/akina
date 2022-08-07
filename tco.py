@@ -38,11 +38,11 @@ class TCO:
         pass
 
     def insurance_buying(self, age, experience, location, body_type, offer_type, car_brand, km_per_month):
-        # This is going to be painful af, need tons of user data to scrape web calculators
+        # To be scraped from partner websites in the future
         return
 
     def insurance_leasing(self, age, experience, location, body_type, offer_type, car_brand, km_per_month):
-        # This is going to be painful af, need tons of user data to scrape web calculators
+        # To be scraped from partner websites in the future
         return
 
     @staticmethod
@@ -51,11 +51,7 @@ class TCO:
 
     @staticmethod
     def repairs(km_per_month, car_age):
-        inspection_yearly = 100
-        oil_change_yearly = 100
-        tires_yearly = None
-        misc_yearly = None
-        return
+        return (0.1875 + car_age*(0.3-0.1875)/20)*km_per_month
 
     @staticmethod
     def inspection():
@@ -64,8 +60,6 @@ class TCO:
     @staticmethod
     def taxes(emission, displacement, fuel_type):
         # SOURCE: https://www.leasingmarkt.de/magazin/recht/auto-unterhaltskosten
-        # TODO: Check for exceptions such as "Sonstige" or "Erdgas"
-        # TODO: Potentially scrape, check differences due to registry year
 
         taxes = 0
 
@@ -101,8 +95,6 @@ class TCO:
     @staticmethod
     def subsidies_buying_used(fuel_type, registry_date, list_price_new, used_price, mileage, emission):
         # SOURCE: https://www.adac.de/rund-ums-fahrzeug/elektromobilitaet/kaufen/foerderung-elektroautos/
-        # TODO: Parse registry date string input
-        # TODO: Get new list price function
         if registry_date < 2019 or list_price_new > 65000:
             return 0
 
