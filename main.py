@@ -203,7 +203,6 @@ def main():
         button.place(x=base_x + (i % 2) * offset_x, y=base_y + (math.ceil(i / 2) - 1) * offset_y)
         i += 1
 
-    next_button_img = tk.PhotoImage(file="images/Button.png")
     next_button = tk.Button(canvas, bg="#00FA8E", borderwidth=0, width=18, height=2, text="Let's fetz", font="Inter",
                             command=next_clicked)
     reset_button = tk.Button(canvas, bg="red", borderwidth=0, width=18, height=2, text="Reset", font="Inter",
